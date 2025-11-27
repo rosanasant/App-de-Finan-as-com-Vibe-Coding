@@ -93,6 +93,6 @@ Prioridade e Clareza: Definir o MVP e usar termos exatos para requisitar a funci
 
 ## Telas de Login e Visão Principal do APP:
 
-![Tela de Login do Vibe Finanças](ativos/tela-de-login.jpg)
+![Tela de Login do Vibe Finanças](ativos/Login.jpg)
 
-![Tela Principal (Chat Home) do Vibe Finanças](ativos/tela-do-app.jpg)
+![Tela Principal (Chat Home) do Vibe Finanças](ativos/Resumo.jpg)
