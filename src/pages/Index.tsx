@@ -132,8 +132,8 @@ const Index = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Reload financial data if transaction or goal was processed
-      if (data.transactionCreated || data.goalCreated) {
+      // Reload financial data if transaction, goal or goal update was processed
+      if (data.transactionCreated || data.goalCreated || data.goalUpdated) {
         await loadFinancialData(user.id);
       }
     } catch (error: any) {
