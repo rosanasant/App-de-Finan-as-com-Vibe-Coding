@@ -89,10 +89,3 @@ A Intenção é o código: Detalhar a intenção ("não-julgadora") e o contexto
 
 Prioridade e Clareza: Definir o MVP e usar termos exatos para requisitar a funcionalidade (ex: "garanta a chamada signInWithCustomToken") economiza iterações e maximiza a entrega em plataformas limitadas.
 
-##Telas de Login e visão principal do APP:
-
-## Telas de Login e Visão Principal do APP:
-
-![Tela de Login do Vibe Finanças](ativos/Login.jpg)
-
-![Tela Principal (Chat Home) do Vibe Finanças](ativos/Resumo.jpg)
