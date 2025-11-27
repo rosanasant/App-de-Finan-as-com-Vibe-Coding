@@ -42,8 +42,11 @@ REGRAS IMPORTANTES:
 - Para metas: pergunte se é para "Poupar" ou "Investir", confirme valor alvo, data alvo e nome
 - Forneça insights motivacionais sobre padrões de gastos
 
-FORMATO DE RESPOSTA JSON:
-Responda SEMPRE em JSON com a estrutura:
+FORMATO DE RESPOSTA JSON (CRÍTICO):
+Responda SEMPRE APENAS com um objeto JSON puro, sem markdown ou code blocks.
+Use EXATAMENTE "income" para receitas e "expense" para despesas.
+
+Estrutura:
 {
   "response": "sua resposta amigável ao usuário",
   "action": "transaction" | "goal" | "insight" | "chat",
@@ -59,6 +62,18 @@ Usuário: "Gastei 50 reais no almoço hoje"
     "amount": 50,
     "type": "expense",
     "category": "Alimentação",
+    "date": "hoje"
+  }
+}
+
+Usuário: "Recebi 1200 do salário"
+{
+  "response": "Que ótimo! Registrei sua receita de R$ 1.200. 🎉",
+  "action": "transaction",
+  "data": {
+    "amount": 1200,
+    "type": "income",
+    "category": "Salário",
     "date": "hoje"
   }
 }
@@ -94,15 +109,26 @@ Usuário: "Quero economizar 5000 reais"
     }
 
     const aiData = await aiResponse.json();
-    const aiContent = aiData.choices[0].message.content;
+    let aiContent = aiData.choices[0].message.content;
 
-    console.log("AI Response:", aiContent);
+    console.log("AI Response (raw):", aiContent);
+
+    // Clean up AI response - remove markdown code blocks if present
+    aiContent = aiContent.trim();
+    if (aiContent.startsWith("```json")) {
+      aiContent = aiContent.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+    } else if (aiContent.startsWith("```")) {
+      aiContent = aiContent.replace(/^```\s*/, "").replace(/\s*```$/, "");
+    }
+
+    console.log("AI Response (cleaned):", aiContent);
 
     // Parse AI response
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(aiContent);
     } catch (e) {
+      console.error("JSON parse error:", e);
       // If not JSON, treat as simple chat
       parsedResponse = {
         response: aiContent,
@@ -118,6 +144,25 @@ Usuário: "Quero economizar 5000 reais"
     if (parsedResponse.action === "transaction" && parsedResponse.data) {
       const { amount, type, category, date } = parsedResponse.data;
       
+      console.log("Processing transaction:", { amount, type, category, date });
+      
+      // Validate type - must be exactly "income" or "expense"
+      const validType = type === "income" ? "income" : type === "expense" ? "expense" : null;
+      
+      if (!validType) {
+        console.error("Invalid transaction type:", type);
+        return new Response(
+          JSON.stringify({
+            response: "Desculpe, tive um problema ao processar o tipo da transação. Pode tentar novamente?",
+            transactionCreated: false,
+            goalCreated: false,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
       // Parse date
       let transactionDate = new Date();
       if (date && date !== "hoje") {
@@ -128,15 +173,28 @@ Usuário: "Quero economizar 5000 reais"
       const { error } = await supabaseClient.from("transactions").insert({
         user_id: userId,
         amount: amount,
-        type: type,
-        category: category,
+        type: validType,
+        category: category || "Outros",
         transaction_date: transactionDate.toISOString().split("T")[0],
       });
 
       if (error) {
         console.error("Error creating transaction:", error);
+        return new Response(
+          JSON.stringify({
+            response: "Desculpe, não consegui salvar a transação. Pode tentar de novo?",
+            transactionCreated: false,
+            goalCreated: false,
+            error: error.message,
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
       } else {
         transactionCreated = true;
+        console.log("Transaction created successfully");
       }
     } else if (parsedResponse.action === "goal" && parsedResponse.data) {
       const { name, type, targetAmount, targetDate } = parsedResponse.data;
