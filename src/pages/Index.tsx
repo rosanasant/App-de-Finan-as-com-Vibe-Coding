@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "@/components/ChatMessage";
 import { FinancialSummary } from "@/components/FinancialSummary";
+import BottomNav from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Send, Loader2 } from "lucide-react";
+import { Wallet, Send, Loader2 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Message {
@@ -102,10 +103,6 @@ const Index = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !user) return;
@@ -161,14 +158,17 @@ const Index = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-20">
       {/* Header */}
-      <header className="border-b bg-card shadow-soft">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Meu Dinheiro</h1>
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
-            <LogOut className="h-5 w-5" />
-          </Button>
+      <header className="border-b bg-card shadow-soft sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+            <Wallet className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Meu Dinheiro</h1>
+            <p className="text-xs text-muted-foreground">Seu assistente financeiro</p>
+          </div>
         </div>
       </header>
 
@@ -220,6 +220,9 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 };

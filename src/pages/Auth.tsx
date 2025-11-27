@@ -50,10 +50,21 @@ const Auth = () => {
 
         if (error) throw error;
 
-        toast({
-          title: "Bem-vindo de volta!",
-          description: "Login realizado com sucesso.",
-        });
+        // Check if user has completed onboarding
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", (await supabase.auth.getUser()).data.user?.id || "")
+          .single();
+
+        if (!profileData?.full_name) {
+          navigate("/onboarding");
+        } else {
+          toast({
+            title: "Bem-vindo de volta!",
+            description: "Login realizado com sucesso.",
+          });
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -70,8 +81,13 @@ const Auth = () => {
 
         toast({
           title: "Conta criada!",
-          description: "Você já pode começar a usar o app.",
+          description: "Vamos configurar seu perfil.",
         });
+
+        // Redirect to onboarding
+        setTimeout(() => {
+          navigate("/onboarding");
+        }, 1000);
       }
     } catch (error: any) {
       toast({
