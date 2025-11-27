@@ -28,6 +28,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Settings = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -89,35 +91,94 @@ const Settings = () => {
         .select("*")
         .eq("user_id", user.id);
 
-      const exportData = {
-        profile,
-        transactions,
-        goals,
-        exportedAt: new Date().toISOString(),
-      };
-
-      // Create and download JSON file
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `meu-dinheiro-backup-${new Date().toISOString().split("T")[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Create PDF
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.setTextColor(59, 130, 246);
+      doc.text("Meu Dinheiro - Relatório Financeiro", 14, 20);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Exportado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 28);
+      
+      // Profile info
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text("Perfil", 14, 40);
+      doc.setFontSize(10);
+      doc.text(`Nome: ${profile.full_name || "Não informado"}`, 14, 48);
+      doc.text(`Email: ${user.email}`, 14, 54);
+      
+      // Financial summary
+      const totalIncome = transactions?.filter(t => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+      const totalExpenses = transactions?.filter(t => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0) || 0;
+      const balance = totalIncome - totalExpenses;
+      
+      doc.setFontSize(14);
+      doc.text("Resumo Financeiro", 14, 66);
+      doc.setFontSize(10);
+      doc.text(`Receitas: R$ ${totalIncome.toFixed(2)}`, 14, 74);
+      doc.text(`Despesas: R$ ${totalExpenses.toFixed(2)}`, 14, 80);
+      doc.setTextColor(balance >= 0 ? 34 : 220, balance >= 0 ? 197 : 38, balance >= 0 ? 94 : 38);
+      doc.text(`Saldo: R$ ${balance.toFixed(2)}`, 14, 86);
+      doc.setTextColor(0, 0, 0);
+      
+      // Transactions table
+      if (transactions && transactions.length > 0) {
+        doc.setFontSize(14);
+        doc.text("Transações", 14, 98);
+        
+        autoTable(doc, {
+          startY: 102,
+          head: [["Data", "Tipo", "Categoria", "Valor", "Descrição"]],
+          body: transactions.map(t => [
+            new Date(t.transaction_date).toLocaleDateString("pt-BR"),
+            t.type === "income" ? "Receita" : "Despesa",
+            t.category,
+            `R$ ${Number(t.amount).toFixed(2)}`,
+            t.description || "-"
+          ]),
+          headStyles: { fillColor: [59, 130, 246] },
+          styles: { fontSize: 8 },
+        });
+      }
+      
+      // Goals table
+      if (goals && goals.length > 0) {
+        const finalY = (doc as any).lastAutoTable?.finalY || 102;
+        doc.setFontSize(14);
+        doc.text("Metas", 14, finalY + 14);
+        
+        autoTable(doc, {
+          startY: finalY + 18,
+          head: [["Nome", "Tipo", "Valor Atual", "Valor Meta", "Data Meta", "Progresso"]],
+          body: goals.map(g => [
+            g.name,
+            g.type === "save" ? "Poupar" : "Investir",
+            `R$ ${Number(g.current_amount).toFixed(2)}`,
+            `R$ ${Number(g.target_amount).toFixed(2)}`,
+            new Date(g.target_date).toLocaleDateString("pt-BR"),
+            `${((Number(g.current_amount) / Number(g.target_amount)) * 100).toFixed(1)}%`
+          ]),
+          headStyles: { fillColor: [59, 130, 246] },
+          styles: { fontSize: 8 },
+        });
+      }
+      
+      // Save PDF
+      doc.save(`meu-dinheiro-relatorio-${new Date().toISOString().split("T")[0]}.pdf`);
 
       toast({
-        title: "Dados exportados!",
-        description: "Seu backup foi baixado com sucesso.",
+        title: "PDF gerado!",
+        description: "Seu relatório foi baixado com sucesso.",
       });
     } catch (error) {
       console.error("Error exporting data:", error);
       toast({
         title: "Erro",
-        description: "Não consegui exportar seus dados.",
+        description: "Não consegui gerar o PDF.",
         variant: "destructive",
       });
     }
@@ -234,7 +295,7 @@ const Settings = () => {
               onClick={exportData}
             >
               <Download className="w-4 h-4 mr-2" />
-              Exportar meus dados
+              Baixar relatório em PDF
             </Button>
             
             <AlertDialog>
