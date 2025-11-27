@@ -51,25 +51,25 @@ REGRAS IMPORTANTES:
 - Seja empático e não julgue o usuário
 - Use linguagem simples e acessível
 - Celebre pequenos sucessos
-- Para transações: extraia valor, tipo (receita/despesa), categoria e data da mensagem
-- Para metas: pergunte se é para "Poupar" ou "Investir", confirme valor alvo, data alvo e nome
-- Forneça insights motivacionais sobre padrões de gastos
+
+PARA TRANSAÇÕES:
+- Extraia valor, tipo (income/expense), categoria e data
+- Se tiver todas as informações, crie a transação
+
+PARA METAS:
+- Pergunte SEMPRE estas informações uma por vez se não tiver:
+  1. Qual o valor da meta?
+  2. É para "Poupar" (save) ou "Investir" (invest)?
+  3. Até quando? (data alvo)
+  4. Qual o nome/objetivo da meta?
+- SOMENTE crie a meta quando tiver TODAS as 4 informações
 
 FORMATO DE RESPOSTA JSON (CRÍTICO):
-Responda SEMPRE APENAS com um objeto JSON puro, sem markdown ou code blocks.
-Use EXATAMENTE "income" para receitas e "expense" para despesas.
+Responda SEMPRE APENAS com um objeto JSON puro, sem markdown.
 
-Estrutura:
+Para TRANSAÇÕES completas:
 {
-  "response": "sua resposta amigável ao usuário",
-  "action": "transaction" | "goal" | "insight" | "chat",
-  "data": {objeto com dados extraídos} ou null
-}
-
-EXEMPLOS:
-Usuário: "Gastei 50 reais no almoço hoje"
-{
-  "response": "Entendi! Registrei R$ 50 no almoço. Está tudo anotado! 💚",
+  "response": "sua resposta amigável",
   "action": "transaction",
   "data": {
     "amount": 50,
@@ -79,23 +79,64 @@ Usuário: "Gastei 50 reais no almoço hoje"
   }
 }
 
-Usuário: "Recebi 1200 do salário"
+Para METAS INCOMPLETAS (conversação):
 {
-  "response": "Que ótimo! Registrei sua receita de R$ 1.200. 🎉",
-  "action": "transaction",
+  "response": "Que legal! Qual o valor que você quer economizar?",
+  "action": "chat",
+  "data": null
+}
+
+Para METAS COMPLETAS (criar):
+{
+  "response": "Perfeito! Criei sua meta de economizar R$ 5.000 até dezembro!",
+  "action": "goal",
   "data": {
-    "amount": 1200,
-    "type": "income",
-    "category": "Salário",
-    "date": "hoje"
+    "name": "Viagem nas férias",
+    "type": "save",
+    "targetAmount": 5000,
+    "targetDate": "2025-12-31"
   }
 }
 
-Usuário: "Quero economizar 5000 reais"
+EXEMPLOS PASSO A PASSO:
+
+Usuário: "Quero economizar para uma viagem"
 {
-  "response": "Que legal! Vamos criar uma meta de economia. Até quando você quer alcançar esses R$ 5.000?",
+  "response": "Que legal! Quanto você quer economizar para essa viagem?",
   "action": "chat",
   "data": null
+}
+
+Usuário: "5000 reais"
+{
+  "response": "Ótimo! E até quando você quer juntar esses R$ 5.000?",
+  "action": "chat",
+  "data": null
+}
+
+Usuário: "até dezembro"
+{
+  "response": "Perfeito! Criei sua meta: economizar R$ 5.000 até dezembro para sua viagem! 🎯",
+  "action": "goal",
+  "data": {
+    "name": "Viagem",
+    "type": "save",
+    "targetAmount": 5000,
+    "targetDate": "2025-12-31"
+  }
+}
+
+TRANSAÇÃO:
+Usuário: "Gastei 50 no almoço"
+{
+  "response": "Registrei R$ 50 em almoço! 💚",
+  "action": "transaction",
+  "data": {
+    "amount": 50,
+    "type": "expense",
+    "category": "Alimentação",
+    "date": "hoje"
+  }
 }`;
 
     // Call Lovable AI
@@ -211,19 +252,61 @@ Usuário: "Quero economizar 5000 reais"
       }
     } else if (parsedResponse.action === "goal" && parsedResponse.data) {
       const { name, type, targetAmount, targetDate } = parsedResponse.data;
+      
+      console.log("Processing goal:", { name, type, targetAmount, targetDate });
+      
+      // Validate required fields
+      if (!name || !type || !targetAmount || !targetDate) {
+        console.error("Missing required goal fields:", parsedResponse.data);
+        return new Response(
+          JSON.stringify({
+            response: "Ops! Parece que faltam algumas informações para criar a meta. Pode tentar novamente?",
+            transactionCreated: false,
+            goalCreated: false,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
+      // Validate type
+      const validType = type === "save" || type === "invest" ? type : "save";
+      
+      // Parse target date
+      let parsedTargetDate = targetDate;
+      if (!targetDate.includes("-")) {
+        // If date is like "dezembro", convert to proper date
+        const targetDateObj = new Date();
+        targetDateObj.setMonth(targetDateObj.getMonth() + 3); // Default 3 months
+        parsedTargetDate = targetDateObj.toISOString().split("T")[0];
+      }
 
       const { error } = await supabaseClient.from("goals").insert({
         user_id: userId,
         name: name,
-        type: type,
-        target_amount: targetAmount,
-        target_date: targetDate,
+        type: validType,
+        target_amount: parseFloat(targetAmount),
+        target_date: parsedTargetDate,
       });
 
       if (error) {
         console.error("Error creating goal:", error);
+        return new Response(
+          JSON.stringify({
+            response: "Desculpe, não consegui criar a meta. Pode tentar de novo?",
+            transactionCreated: false,
+            goalCreated: false,
+            error: error.message,
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
       } else {
         goalCreated = true;
+        console.log("Goal created successfully");
       }
     }
 
