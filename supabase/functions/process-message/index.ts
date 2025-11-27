@@ -18,9 +18,22 @@ serve(async (req) => {
       throw new Error("Message and userId are required");
     }
 
+    // Get the authorization token from the request
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      throw new Error("Authorization header is required");
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      }
     );
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
