@@ -71,3 +71,20 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Reflexão sobre o Processo
+O que funcionou bem?
+
+A criação de um PRD detalhado e revisado foi crucial. Os comandos diretos, como "A IA deve confirmar o Valor Alvo...", resultaram em fluxos lógicos e com alta Tolerância ao Erro, evitando o desperdício de créditos em ajustes conceituais.
+
+O foco em Vibe Coding garantiu que o Agente Financeiro fosse criado com uma personalidade empática, o que é um diferencial forte no conceito do produto.
+
+O que não funcionou como o esperado?
+
+A limitação de créditos diários exigiu uma estratégia de prompt muito rígida. A necessidade de realizar uma nova conta Lovable mostrou que a limitação de contexto e créditos é o maior desafio no desenvolvimento assistido por IA, forçando o desenvolvedor a ser extremamente intencional.
+
+## O que aprendi sobre conversar com IAs?
+
+A Intenção é o código: Detalhar a intenção ("não-julgadora") e o contexto ("oportunidade de economia") é mais importante do que tentar descrever tecnicamente a função.
+
+Prioridade e Clareza: Definir o MVP e usar termos exatos para requisitar a funcionalidade (ex: "garanta a chamada signInWithCustomToken") economiza iterações e maximiza a entrega em plataformas limitadas.
