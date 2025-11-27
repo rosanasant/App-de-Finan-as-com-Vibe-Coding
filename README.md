@@ -88,3 +88,9 @@ A limitação de créditos diários exigiu uma estratégia de prompt muito rígi
 A Intenção é o código: Detalhar a intenção ("não-julgadora") e o contexto ("oportunidade de economia") é mais importante do que tentar descrever tecnicamente a função.
 
 Prioridade e Clareza: Definir o MVP e usar termos exatos para requisitar a funcionalidade (ex: "garanta a chamada signInWithCustomToken") economiza iterações e maximiza a entrega em plataformas limitadas.
+
+##Telas de Login e visão principal do APP:
+
+![Descrição da Tela de Login](ativos/tela de login.jpg)
+
+![Descrição da Tela de Login](ativos/tela do app.jpg)
