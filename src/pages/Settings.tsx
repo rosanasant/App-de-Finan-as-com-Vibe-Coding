@@ -145,26 +145,96 @@ const Settings = () => {
         });
       }
       
-      // Goals table
+      // Goals section with visual progress bars and descriptions
       if (goals && goals.length > 0) {
         const finalY = (doc as any).lastAutoTable?.finalY || 102;
         doc.setFontSize(14);
-        doc.text("Metas", 14, finalY + 14);
+        doc.setTextColor(0, 0, 0);
+        doc.text("Metas Financeiras", 14, finalY + 14);
         
-        autoTable(doc, {
-          startY: finalY + 18,
-          head: [["Nome", "Tipo", "Valor Atual", "Valor Meta", "Data Meta", "Progresso"]],
-          body: goals.map(g => [
-            g.name,
-            g.type === "save" ? "Poupar" : "Investir",
-            `R$ ${Number(g.current_amount).toFixed(2)}`,
-            `R$ ${Number(g.target_amount).toFixed(2)}`,
-            new Date(g.target_date).toLocaleDateString("pt-BR"),
-            `${((Number(g.current_amount) / Number(g.target_amount)) * 100).toFixed(1)}%`
-          ]),
-          headStyles: { fillColor: [59, 130, 246] },
-          styles: { fontSize: 8 },
+        let currentY = finalY + 22;
+        
+        // Draw each goal with progress bar and description
+        goals.forEach((goal, index) => {
+          const progress = (Number(goal.current_amount) / Number(goal.target_amount)) * 100;
+          const progressCapped = Math.min(progress, 100);
+          
+          // Check if we need a new page
+          if (currentY > 260) {
+            doc.addPage();
+            currentY = 20;
+          }
+          
+          // Goal name and type
+          doc.setFontSize(11);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`${index + 1}. ${goal.name}`, 14, currentY);
+          doc.setFontSize(9);
+          doc.setTextColor(100, 100, 100);
+          doc.text(`(${goal.type === "save" ? "Poupar" : "Investir"})`, 14 + doc.getTextWidth(`${index + 1}. ${goal.name} `), currentY);
+          
+          currentY += 6;
+          
+          // Progress bar background (gray)
+          doc.setFillColor(220, 220, 220);
+          doc.rect(14, currentY, 100, 6, "F");
+          
+          // Progress bar fill (orange for incomplete, green for complete)
+          if (progressCapped >= 100) {
+            doc.setFillColor(34, 197, 94); // green
+          } else {
+            doc.setFillColor(255, 140, 0); // orange
+          }
+          doc.rect(14, currentY, (100 * progressCapped) / 100, 6, "F");
+          
+          // Progress percentage
+          doc.setFontSize(9);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`${progressCapped.toFixed(1)}%`, 118, currentY + 4);
+          
+          currentY += 10;
+          
+          // Goal details description
+          doc.setFontSize(9);
+          doc.setTextColor(60, 60, 60);
+          const currentAmount = `R$ ${Number(goal.current_amount).toFixed(2)}`;
+          const targetAmount = `R$ ${Number(goal.target_amount).toFixed(2)}`;
+          const targetDate = new Date(goal.target_date).toLocaleDateString("pt-BR");
+          const remaining = Number(goal.target_amount) - Number(goal.current_amount);
+          const remainingText = remaining > 0 ? `R$ ${remaining.toFixed(2)}` : "Meta atingida!";
+          
+          doc.text(`Atual: ${currentAmount} | Meta: ${targetAmount} | Data: ${targetDate}`, 14, currentY);
+          currentY += 5;
+          doc.text(`Faltam: ${remainingText}`, 14, currentY);
+          
+          currentY += 10;
         });
+        
+        // Summary statistics for goals
+        const totalGoalsAmount = goals.reduce((sum, g) => sum + Number(g.target_amount), 0);
+        const totalSaved = goals.reduce((sum, g) => sum + Number(g.current_amount), 0);
+        const overallProgress = totalGoalsAmount > 0 ? (totalSaved / totalGoalsAmount) * 100 : 0;
+        
+        if (currentY > 250) {
+          doc.addPage();
+          currentY = 20;
+        }
+        
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text("Resumo Geral das Metas", 14, currentY);
+        currentY += 8;
+        
+        doc.setFontSize(10);
+        doc.text(`Total de metas: ${goals.length}`, 14, currentY);
+        currentY += 6;
+        doc.text(`Valor total das metas: R$ ${totalGoalsAmount.toFixed(2)}`, 14, currentY);
+        currentY += 6;
+        doc.text(`Total economizado: R$ ${totalSaved.toFixed(2)}`, 14, currentY);
+        currentY += 6;
+        doc.setTextColor(overallProgress >= 100 ? 34 : 255, overallProgress >= 100 ? 197 : 140, overallProgress >= 100 ? 94 : 0);
+        doc.text(`Progresso geral: ${overallProgress.toFixed(1)}%`, 14, currentY);
+        doc.setTextColor(0, 0, 0);
       }
       
       // Save PDF
