@@ -12,10 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    const { message, userId } = await req.json();
+    const body = await req.json();
+    const { userId } = body;
+    const messages = body.messages as { role: "user" | "assistant"; content: string }[] | undefined;
+    const singleMessage = body.message as string | undefined;
 
-    if (!message || !userId) {
-      throw new Error("Message and userId are required");
+    if (!userId || (!messages && !singleMessage)) {
+      throw new Error("userId and at least one message are required");
     }
 
     // Get the authorization token from the request
@@ -58,18 +61,18 @@ PARA TRANSAÇÕES:
 - Se tiver todas as informações, crie a transação
 
 PARA CRIAR METAS NOVAS:
-- Pergunte SEMPRE estas informações uma por vez se não tiver:
+- SEMPRE use o histórico da conversa para lembrar respostas anteriores do usuário
+- Pergunte estas informações uma por vez se ainda não tiver todas:
   1. Qual o valor da meta?
   2. É para "Poupar" (save) ou "Investir" (invest)?
   3. Até quando? (data alvo)
   4. Qual o nome/objetivo da meta?
-- SOMENTE crie a meta quando tiver TODAS as 4 informações
+- SOMENTE use "action": "create_goal" quando já tiver as 4 informações acima
 
 PARA APORTES EM METAS EXISTENTES:
 - Se o usuário mencionar "colocar", "adicionar", "aportar", "depositar" um valor EM uma meta
-- Ou se falar "coloquei X na meta Y"
-- Use action "update_goal" e extraia o valor e o nome da meta
-- Sempre confirme qual meta ele quer atualizar
+- Ou se falar "coloquei X na meta Y" ou "transferir do saldo para a meta Y"
+- Use action "update_goal" e extraia o valor e o nome da meta e sempre confirme qual meta ele quer atualizar
 
 FORMATO DE RESPOSTA JSON (CRÍTICO):
 Responda SEMPRE APENAS com um objeto JSON puro, sem markdown.
@@ -147,6 +150,10 @@ Usuário: "Quero economizar 3000 reais"
   "data": null
 }`;
 
+    const aiMessages = messages && messages.length > 0
+      ? messages
+      : [{ role: "user", content: singleMessage as string }];
+
     // Call Lovable AI
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -158,7 +165,7 @@ Usuário: "Quero economizar 3000 reais"
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: message },
+          ...aiMessages,
         ],
       }),
     });
