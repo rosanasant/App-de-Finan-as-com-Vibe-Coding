@@ -118,8 +118,13 @@ const Index = () => {
     setLoading(true);
 
     try {
+      const historyMessages = [...messages, userMessage].map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       const { data, error } = await supabase.functions.invoke("process-message", {
-        body: { message: inputMessage, userId: user.id },
+        body: { messages: historyMessages, userId: user.id },
       });
 
       if (error) throw error;
