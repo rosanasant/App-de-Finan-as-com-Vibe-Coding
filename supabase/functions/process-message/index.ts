@@ -160,7 +160,6 @@ Usuário: "Quero economizar 3000 reais"
           { role: "system", content: systemPrompt },
           { role: "user", content: message },
         ],
-        temperature: 0.7,
       }),
     });
 
