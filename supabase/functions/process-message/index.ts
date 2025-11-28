@@ -69,10 +69,20 @@ PARA CRIAR METAS NOVAS:
   4. Qual o nome/objetivo da meta?
 - SOMENTE use "action": "create_goal" quando já tiver as 4 informações acima
 
-PARA APORTES EM METAS EXISTENTES:
+PARA APORTES EM METAS EXISTENTES (ADICIONAR VALOR NA META):
 - Se o usuário mencionar "colocar", "adicionar", "aportar", "depositar" um valor EM uma meta
 - Ou se falar "coloquei X na meta Y" ou "transferir do saldo para a meta Y"
-- Use action "update_goal" e extraia o valor e o nome da meta e sempre confirme qual meta ele quer atualizar
+- Use "action": "update_goal" com o campo "amount" preenchido e "goalName" com o nome da meta
+
+PARA ALTERAR UMA META EXISTENTE (MUDAR O VALOR-ALVO, NOME OU DATA):
+- Frases como "quero alterar o valor da meta", "mudar a meta de 5.000 para 8.000", "trocar a data da meta", etc.
+- Use SEMPRE "action": "update_goal"
+- NÃO use o campo "amount" nesses casos
+- Em vez disso, preencha em "data" os campos apropriados:
+  - "newTargetAmount" quando for mudar o valor-alvo da meta
+  - "newTargetDate" quando for mudar a data da meta (formato AAAA-MM-DD quando possível)
+  - "newName" quando for renomear a meta
+- "goalName" deve sempre indicar qual meta será alterada
 
 FORMATO DE RESPOSTA JSON (CRÍTICO):
 Responda SEMPRE APENAS com um objeto JSON puro, sem markdown.
@@ -324,30 +334,14 @@ Usuário: "Quero economizar 3000 reais"
         console.log("Goal created successfully");
       }
     } else if (parsedResponse.action === "update_goal" && parsedResponse.data) {
-      const { amount, goalName } = parsedResponse.data;
+      const { amount, goalName, newTargetAmount, newTargetDate, newName } = parsedResponse.data;
       
-      console.log("Processing goal update:", { amount, goalName });
+      console.log("Processing goal update:", { amount, goalName, newTargetAmount, newTargetDate, newName });
       
-      if (!amount) {
-        console.error("Missing amount for goal update");
-        return new Response(
-          JSON.stringify({
-            response: "Ops! Não consegui identificar o valor. Pode tentar novamente?",
-            transactionCreated: false,
-            goalCreated: false,
-            goalUpdated: false,
-          }),
-          {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-      
-      // If no goal name specified, need to ask which goal
       if (!goalName) {
         return new Response(
           JSON.stringify({
-            response: parsedResponse.response,
+            response: parsedResponse.response || "Qual meta você gostaria de alterar?",
             transactionCreated: false,
             goalCreated: false,
             goalUpdated: false,
@@ -358,7 +352,7 @@ Usuário: "Quero economizar 3000 reais"
         );
       }
       
-      // Find the goal by name (case insensitive, partial match)
+      // Encontrar meta pelo nome (case insensitive, parcial)
       const { data: goals, error: fetchError } = await supabaseClient
         .from("goals")
         .select("*")
@@ -367,7 +361,7 @@ Usuário: "Quero economizar 3000 reais"
         .limit(1);
       
       if (fetchError || !goals || goals.length === 0) {
-        console.error("Goal not found:", goalName);
+        console.error("Goal not found:", goalName, fetchError);
         return new Response(
           JSON.stringify({
             response: `Hmm, não encontrei uma meta com o nome "${goalName}". Pode verificar o nome e tentar novamente?`,
@@ -382,12 +376,51 @@ Usuário: "Quero economizar 3000 reais"
       }
       
       const goal = goals[0];
-      const newAmount = Number(goal.current_amount) + Number(amount);
+      let updatePayload: Record<string, unknown> = {};
+      let extraMessage = "";
       
-      // Update goal with new amount
+      // Caso 1: aporte (adicionar valor na meta)
+      if (amount) {
+        const newAmountTotal = Number(goal.current_amount) + Number(amount);
+        updatePayload.current_amount = newAmountTotal;
+        const progress = ((newAmountTotal / Number(goal.target_amount)) * 100).toFixed(0);
+        extraMessage += ` Agora você já tem R$ ${newAmountTotal.toFixed(2)} (${progress}% da meta)! 🎯`;
+      }
+      
+      // Caso 2: alteração do valor-alvo, data ou nome da meta
+      if (newTargetAmount) {
+        updatePayload.target_amount = Number(newTargetAmount);
+        extraMessage += ` O novo valor-alvo da meta foi ajustado para R$ ${Number(newTargetAmount).toFixed(2)}.`;
+      }
+      
+      if (newTargetDate) {
+        updatePayload.target_date = newTargetDate;
+        extraMessage += ` A data alvo da meta foi atualizada para ${newTargetDate}.`;
+      }
+      
+      if (newName) {
+        updatePayload.name = newName;
+        extraMessage += ` O nome da meta agora é "${newName}".`;
+      }
+      
+      if (Object.keys(updatePayload).length === 0) {
+        console.error("No valid fields to update for goal:", parsedResponse.data);
+        return new Response(
+          JSON.stringify({
+            response: "Não encontrei nenhuma informação para atualizar na meta. Pode repetir o que você quer mudar?",
+            transactionCreated: false,
+            goalCreated: false,
+            goalUpdated: false,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
       const { error: updateError } = await supabaseClient
         .from("goals")
-        .update({ current_amount: newAmount })
+        .update(updatePayload)
         .eq("id", goal.id);
       
       if (updateError) {
@@ -407,8 +440,7 @@ Usuário: "Quero economizar 3000 reais"
         );
       } else {
         goalUpdated = true;
-        const progress = ((newAmount / Number(goal.target_amount)) * 100).toFixed(0);
-        parsedResponse.response = `${parsedResponse.response} Agora você já tem R$ ${newAmount.toFixed(2)} (${progress}% da meta)! 🎯`;
+        parsedResponse.response = `${parsedResponse.response || "Meta atualizada com sucesso!"}${extraMessage}`;
         console.log("Goal updated successfully");
       }
     }
