@@ -20,7 +20,7 @@ interface CategoryData {
   value: number;
 }
 
-const COLORS = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444"];
+const COLORS = ["#6b8e3f", "#8ba956", "#5a7831", "#9db86d", "#4d6829"];
 
 const MonthlyReport = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -254,7 +254,7 @@ const MonthlyReport = () => {
                   labelLine={false}
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                   outerRadius={100}
-                  fill="#8884d8"
+                  fill="hsl(var(--primary))"
                   dataKey="value"
                 >
                   {categoryData.map((entry, index) => (
