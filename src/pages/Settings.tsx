@@ -179,11 +179,11 @@ const Settings = () => {
           doc.setFillColor(220, 220, 220);
           doc.rect(14, currentY, 100, 6, "F");
           
-          // Progress bar fill (orange for incomplete, green for complete)
+          // Progress bar fill (moss green for incomplete, darker moss green for complete)
           if (progressCapped >= 100) {
-            doc.setFillColor(34, 197, 94); // green
+            doc.setFillColor(90, 120, 49); // dark moss green
           } else {
-            doc.setFillColor(255, 140, 0); // orange
+            doc.setFillColor(107, 142, 63); // moss green
           }
           doc.rect(14, currentY, (100 * progressCapped) / 100, 6, "F");
           
@@ -232,7 +232,7 @@ const Settings = () => {
         currentY += 6;
         doc.text(`Total economizado: R$ ${totalSaved.toFixed(2)}`, 14, currentY);
         currentY += 6;
-        doc.setTextColor(overallProgress >= 100 ? 34 : 255, overallProgress >= 100 ? 197 : 140, overallProgress >= 100 ? 94 : 0);
+        doc.setTextColor(overallProgress >= 100 ? 90 : 107, overallProgress >= 100 ? 120 : 142, overallProgress >= 100 ? 49 : 63);
         doc.text(`Progresso geral: ${overallProgress.toFixed(1)}%`, 14, currentY);
         doc.setTextColor(0, 0, 0);
       }
