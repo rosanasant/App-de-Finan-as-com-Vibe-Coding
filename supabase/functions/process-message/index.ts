@@ -274,6 +274,82 @@ Usuário: "Quero economizar 3000 reais"
       } else {
         transactionCreated = true;
         console.log("Transaction created successfully");
+        
+        // ===== PURCHASE REVIEW ANALYSIS =====
+        // After expense is recorded, check if it exceeds 30% of category average
+        if (validType === "expense") {
+          console.log("Analyzing purchase for review...");
+          
+          // Check if this category has been ignored in the last 7 days
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          
+          const { data: ignoredTips } = await supabaseClient
+            .from("ignored_tips")
+            .select("*")
+            .eq("user_id", userId)
+            .eq("category", category || "Outros")
+            .gte("ignored_until", new Date().toISOString())
+            .limit(1);
+          
+          const isIgnored = ignoredTips && ignoredTips.length > 0;
+          
+          if (!isIgnored) {
+            // Calculate average for this category in the last 30 days
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            const { data: recentTransactions } = await supabaseClient
+              .from("transactions")
+              .select("amount")
+              .eq("user_id", userId)
+              .eq("type", "expense")
+              .eq("category", category || "Outros")
+              .gte("transaction_date", thirtyDaysAgo.toISOString().split("T")[0]);
+            
+            if (recentTransactions && recentTransactions.length > 1) {
+              // Calculate average (excluding current transaction)
+              const totalAmount = recentTransactions
+                .slice(0, -1)
+                .reduce((sum, t) => sum + Number(t.amount), 0);
+              const avgAmount = totalAmount / (recentTransactions.length - 1);
+              const threshold = avgAmount * 1.3;
+              
+              console.log(`Purchase analysis: current=${amount}, avg=${avgAmount}, threshold=${threshold}`);
+              
+              // If current expense exceeds threshold by 30%
+              if (amount > threshold) {
+                // Calculate suggested savings (20% of difference)
+                const difference = amount - avgAmount;
+                const suggestedSavings = difference * 0.2;
+                
+                // Get user's goals to mention in the message
+                const { data: userGoals } = await supabaseClient
+                  .from("goals")
+                  .select("name, target_amount, current_amount")
+                  .eq("user_id", userId)
+                  .order("created_at", { ascending: false })
+                  .limit(1);
+                
+                const goalMention = userGoals && userGoals.length > 0
+                  ? ` sua meta '${userGoals[0].name}'`
+                  : " suas metas";
+                
+                // Override the response with purchase review message
+                parsedResponse.response = `${parsedResponse.response}\n\n💡 Vi que este gasto foi um pouco maior que o habitual. Se você pudesse reduzir 20% disso na próxima vez, estaria R$ ${suggestedSavings.toFixed(2)} mais perto de${goalMention}.`;
+                parsedResponse.purchaseReview = {
+                  category: category || "Outros",
+                  suggestedSavings: suggestedSavings,
+                  goalName: userGoals && userGoals.length > 0 ? userGoals[0].name : null,
+                };
+                
+                console.log("Purchase review triggered:", parsedResponse.purchaseReview);
+              }
+            }
+          } else {
+            console.log("Category ignored for tips until:", ignoredTips[0].ignored_until);
+          }
+        }
       }
     } else if (parsedResponse.action === "create_goal" && parsedResponse.data) {
       const { name, type, targetAmount, targetDate } = parsedResponse.data;
@@ -451,6 +527,7 @@ Usuário: "Quero economizar 3000 reais"
         transactionCreated,
         goalCreated,
         goalUpdated,
+        purchaseReview: parsedResponse.purchaseReview || null,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
