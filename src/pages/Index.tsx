@@ -8,7 +8,7 @@ import { FinancialSummary } from "@/components/FinancialSummary";
 import { PurchaseReviewActions } from "@/components/PurchaseReviewActions";
 import BottomNav from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
-import { Wallet, Send, Loader2 } from "lucide-react";
+import { Wallet, Send, Loader2, Receipt } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Message {
@@ -290,6 +290,18 @@ const Index = () => {
           expenses={expenses}
           goalsCount={goalsCount}
         />
+
+        {/* Quick Access Button */}
+        <div className="mb-4">
+          <Button
+            onClick={() => navigate("/transactions")}
+            variant="outline"
+            className="w-full gap-2 bg-card shadow-soft hover:shadow-card transition-smooth"
+          >
+            <Receipt className="w-4 h-4" />
+            EXTRATO
+          </Button>
+        </div>
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
