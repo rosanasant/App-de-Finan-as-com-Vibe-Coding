@@ -58,6 +58,38 @@ export type Database = {
           },
         ]
       }
+      ignored_tips: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          ignored_until: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          ignored_until: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          ignored_until?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ignored_tips_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

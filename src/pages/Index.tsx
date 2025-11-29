@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatMessage } from "@/components/ChatMessage";
 import { FinancialSummary } from "@/components/FinancialSummary";
+import { PurchaseReviewActions } from "@/components/PurchaseReviewActions";
 import BottomNav from "@/components/BottomNav";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet, Send, Loader2 } from "lucide-react";
@@ -14,6 +15,11 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  purchaseReview?: {
+    category: string;
+    suggestedSavings: number;
+    goalName: string | null;
+  } | null;
 }
 
 const Index = () => {
@@ -133,6 +139,7 @@ const Index = () => {
         role: "assistant",
         content: data.response,
         timestamp: new Date(),
+        purchaseReview: data.purchaseReview || null,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -157,6 +164,104 @@ const Index = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handleAcceptSavingsTip = async (
+    category: string,
+    suggestedSavings: number,
+    goalName: string | null
+  ) => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      // Create a message to the AI requesting the creation of a savings goal
+      const requestMessage = `Quero criar uma meta de economia de R$ ${suggestedSavings.toFixed(
+        2
+      )} para a próxima semana relacionada a ${category}`;
+
+      const userMessage: Message = {
+        role: "user",
+        content: requestMessage,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, userMessage]);
+
+      const historyMessages = [...messages, userMessage].map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const { data, error } = await supabase.functions.invoke("process-message", {
+        body: { messages: historyMessages, userId: user.id },
+      });
+
+      if (error) throw error;
+
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.response,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+
+      if (data.goalCreated) {
+        await loadFinancialData(user.id);
+        toast({
+          title: "Sub-meta criada!",
+          description: "Sua meta de economia foi criada com sucesso.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error creating savings goal:", error);
+      toast({
+        title: "Erro",
+        description: "Não consegui criar a meta. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleIgnoreTip = async (category: string) => {
+    if (!user) return;
+
+    try {
+      // Add to ignored tips for 7 days
+      const sevenDaysLater = new Date();
+      sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
+
+      const { error } = await supabase.from("ignored_tips").insert({
+        user_id: user.id,
+        category: category,
+        ignored_until: sevenDaysLater.toISOString(),
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Dica ignorada",
+        description: `Não mostrarei mais dicas para ${category} nos próximos 7 dias.`,
+      });
+
+      // Remove purchase review from the last message
+      setMessages((prev) =>
+        prev.map((msg, idx) =>
+          idx === prev.length - 1 ? { ...msg, purchaseReview: null } : msg
+        )
+      );
+    } catch (error: any) {
+      console.error("Error ignoring tip:", error);
+      toast({
+        title: "Erro",
+        description: "Não consegui ignorar a dica. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -189,12 +294,31 @@ const Index = () => {
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
           {messages.map((message, index) => (
-            <ChatMessage
-              key={index}
-              role={message.role}
-              content={message.content}
-              timestamp={message.timestamp}
-            />
+            <div key={index}>
+              <ChatMessage
+                role={message.role}
+                content={message.content}
+                timestamp={message.timestamp}
+              />
+              {message.purchaseReview && (
+                <PurchaseReviewActions
+                  category={message.purchaseReview.category}
+                  suggestedSavings={message.purchaseReview.suggestedSavings}
+                  goalName={message.purchaseReview.goalName}
+                  onAccept={() =>
+                    handleAcceptSavingsTip(
+                      message.purchaseReview!.category,
+                      message.purchaseReview!.suggestedSavings,
+                      message.purchaseReview!.goalName
+                    )
+                  }
+                  onIgnore={() =>
+                    handleIgnoreTip(message.purchaseReview!.category)
+                  }
+                  disabled={loading}
+                />
+              )}
+            </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
