@@ -8,97 +8,130 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Fundo principal - cinza claro suave */
+    --background: 210 20% 97%;
     --foreground: 0 0% 20%;
 
-    --card: 0 0% 98%;
+    /* Cards com neumorphism */
+    --card: 210 20% 97%;
     --card-foreground: 0 0% 20%;
 
-    --popover: 0 0% 100%;
+    --popover: 210 20% 97%;
     --popover-foreground: 0 0% 20%;
 
-    --primary: 90 25% 40%;
+    /* Azul-petróleo suave como primária */
+    --primary: 174 44% 49%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 95%;
+    /* Secundária mais suave */
+    --secondary: 210 17% 95%;
     --secondary-foreground: 0 0% 20%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 210 17% 93%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 90 30% 50%;
-    --accent-foreground: 0 0% 100%;
+    /* Laranja/Pêssego como destaque */
+    --accent: 30 100% 75%;
+    --accent-foreground: 0 0% 20%;
 
-    --destructive: 0 84% 60%;
+    /* Vermelho suave para despesas */
+    --destructive: 0 70% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 90 25% 40%;
+    /* Verde suave para saldo positivo */
+    --success: 140 45% 55%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 1rem;
+    --border: 210 17% 90%;
+    --input: 210 20% 97%;
+    --ring: 174 44% 49%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(90 25% 40%), hsl(90 30% 50%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --radius: 1.25rem;
+
+    /* Gradientes suaves */
+    --gradient-primary: linear-gradient(135deg, hsl(174 44% 49%), hsl(174 44% 60%));
+    --gradient-card: linear-gradient(145deg, hsl(210 20% 97%), hsl(210 17% 95%));
     
-    --shadow-soft: 0 2px 8px hsl(0 0% 0% / 0.06);
-    --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.08);
+    /* Sombras Neumorphic - sombra dupla */
+    --shadow-neu-light: -8px -8px 16px hsl(0 0% 100%);
+    --shadow-neu-dark: 8px 8px 16px hsl(210 10% 85%);
+    --shadow-neu: var(--shadow-neu-light), var(--shadow-neu-dark);
+    
+    /* Sombra interna (afundado) */
+    --shadow-neu-inset-light: inset -4px -4px 8px hsl(0 0% 100%);
+    --shadow-neu-inset-dark: inset 4px 4px 8px hsl(210 10% 85%);
+    --shadow-neu-inset: var(--shadow-neu-inset-light), var(--shadow-neu-inset-dark);
+    
+    /* Glassmorphism */
+    --glass-bg: hsla(210, 20%, 97%, 0.7);
+    --glass-border: hsla(210, 17%, 90%, 0.3);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 210 20% 97%;
     --sidebar-foreground: 0 0% 26%;
-    --sidebar-primary: 90 25% 40%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 95%;
+    --sidebar-primary: 174 44% 49%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 17% 95%;
     --sidebar-accent-foreground: 0 0% 20%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 90 25% 40%;
+    --sidebar-border: 210 17% 90%;
+    --sidebar-ring: 174 44% 49%;
   }
 
   .dark {
-    --background: 0 0% 12%;
+    --background: 210 15% 12%;
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 16%;
+    --card: 210 15% 15%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 16%;
+    --popover: 210 15% 15%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 90 25% 45%;
+    --primary: 174 44% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 20%;
+    --secondary: 210 15% 20%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 22%;
+    --muted: 210 15% 22%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 90 30% 50%;
-    --accent-foreground: 0 0% 12%;
+    --accent: 30 100% 70%;
+    --accent-foreground: 210 15% 12%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 62% 55%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 0 0% 24%;
-    --input: 0 0% 24%;
-    --ring: 90 25% 45%;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(90 25% 45%), hsl(90 30% 50%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 16%), hsl(0 0% 14%));
-    
-    --shadow-soft: 0 2px 8px hsl(0 0% 0% / 0.3);
-    --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.4);
+    --success: 140 45% 50%;
+    --success-foreground: 0 0% 100%;
 
-    --sidebar-background: 0 0% 12%;
+    --border: 210 15% 24%;
+    --input: 210 15% 15%;
+    --ring: 174 44% 55%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(174 44% 55%), hsl(174 44% 65%));
+    --gradient-card: linear-gradient(145deg, hsl(210 15% 15%), hsl(210 15% 13%));
+    
+    --shadow-neu-light: -8px -8px 16px hsl(210 15% 18%);
+    --shadow-neu-dark: 8px 8px 16px hsl(210 15% 8%);
+    --shadow-neu: var(--shadow-neu-light), var(--shadow-neu-dark);
+    
+    --shadow-neu-inset-light: inset -4px -4px 8px hsl(210 15% 18%);
+    --shadow-neu-inset-dark: inset 4px 4px 8px hsl(210 15% 8%);
+    --shadow-neu-inset: var(--shadow-neu-inset-light), var(--shadow-neu-inset-dark);
+    
+    --glass-bg: hsla(210, 15%, 15%, 0.7);
+    --glass-border: hsla(210, 15%, 24%, 0.3);
+
+    --sidebar-background: 210 15% 12%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 90 25% 45%;
+    --sidebar-primary: 174 44% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent: 210 15% 20%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 24%;
-    --sidebar-ring: 90 25% 45%;
+    --sidebar-border: 210 15% 24%;
+    --sidebar-ring: 174 44% 55%;
   }
 }
 
@@ -125,15 +158,35 @@ All colors MUST be HSL.
     background: var(--gradient-card);
   }
   
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
+  /* Neumorphic shadow (floating) */
+  .shadow-neu {
+    box-shadow: var(--shadow-neu);
   }
   
-  .shadow-card {
-    box-shadow: var(--shadow-card);
+  /* Neumorphic inset shadow (pressed/input) */
+  .shadow-neu-inset {
+    box-shadow: var(--shadow-neu-inset);
+  }
+  
+  /* Glassmorphism effect */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
   }
   
   .transition-smooth {
     transition: var(--transition-smooth);
+  }
+  
+  /* Hover effect for neumorphic buttons */
+  .neu-button-hover:hover {
+    transform: translateY(-2px);
+  }
+  
+  .neu-button-hover:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-neu-inset);
   }
 }

@@ -270,13 +270,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20">
       {/* Header */}
-      <header className="border-b bg-card shadow-soft sticky top-0 z-10">
+      <header className="border-b border-border/30 bg-card shadow-neu sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+          <div className="w-11 h-11 rounded-[14px] shadow-neu bg-gradient-primary flex items-center justify-center">
             <Wallet className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Meu Dinheiro</h1>
+            <h1 className="text-xl font-bold">Vibe Finanças</h1>
             <p className="text-xs text-muted-foreground">Seu assistente financeiro</p>
           </div>
         </div>
@@ -293,14 +293,13 @@ const Index = () => {
 
         {/* Quick Access Button */}
         <div className="mb-4">
-          <Button
+          <button
             onClick={() => navigate("/transactions")}
-            variant="outline"
-            className="w-full gap-2 bg-card shadow-soft hover:shadow-card transition-smooth"
+            className="w-full gap-2 bg-card shadow-neu rounded-[16px] px-4 py-3 flex items-center justify-center text-foreground font-semibold transition-smooth hover:shadow-neu-inset"
           >
-            <Receipt className="w-4 h-4" />
+            <Receipt className="w-5 h-5" />
             EXTRATO
-          </Button>
+          </button>
         </div>
 
         {/* Chat Messages */}
@@ -337,27 +336,28 @@ const Index = () => {
 
         {/* Input Area */}
         <div className="sticky bottom-0 bg-background pt-4 pb-2">
-          <div className="flex gap-2">
-            <Input
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Digite sua mensagem... Ex: Gastei 50 reais no almoço"
-              disabled={loading}
-              className="flex-1"
-            />
-            <Button
+          <div className="flex gap-3">
+            <div className="flex-1 bg-card rounded-[16px] shadow-neu-inset">
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Digite sua mensagem..."
+                disabled={loading}
+                className="bg-transparent border-0 shadow-none px-4 py-3 placeholder:text-muted-foreground focus-visible:ring-0"
+              />
+            </div>
+            <button
               onClick={handleSendMessage}
               disabled={loading || !inputMessage.trim()}
-              size="icon"
-              className="shrink-0"
+              className="w-12 h-12 rounded-[16px] bg-gradient-primary shadow-neu flex items-center justify-center text-primary-foreground disabled:opacity-50 neu-button-hover"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <Send className="h-5 w-5" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
       </main>

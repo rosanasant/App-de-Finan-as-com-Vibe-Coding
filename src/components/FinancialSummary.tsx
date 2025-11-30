@@ -12,59 +12,63 @@ export const FinancialSummary = ({ income, expenses, goalsCount }: FinancialSumm
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="p-6 gradient-card shadow-card">
+      {/* Saldo */}
+      <div className="bg-card rounded-[18px] shadow-neu p-6 transition-smooth hover:shadow-neu-inset">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Saldo</p>
-            <p className={`text-2xl font-bold ${balance >= 0 ? 'text-primary' : 'text-destructive'}`}>
+            <p className="text-sm text-muted-foreground mb-1 font-medium">Saldo</p>
+            <p className={`text-2xl font-bold ${balance >= 0 ? 'text-success' : 'text-destructive'}`}>
               R$ {balance.toFixed(2)}
             </p>
           </div>
-          <div className={`w-12 h-12 rounded-xl ${balance >= 0 ? 'bg-primary/10' : 'bg-destructive/10'} flex items-center justify-center`}>
-            <Wallet className={`w-6 h-6 ${balance >= 0 ? 'text-primary' : 'text-destructive'}`} />
+          <div className={`w-12 h-12 rounded-[14px] shadow-neu flex items-center justify-center ${balance >= 0 ? 'bg-success/10' : 'bg-destructive/10'}`}>
+            <Wallet className={`w-6 h-6 ${balance >= 0 ? 'text-success' : 'text-destructive'}`} />
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-6 gradient-card shadow-card">
+      {/* Receitas */}
+      <div className="bg-card rounded-[18px] shadow-neu p-6 transition-smooth hover:shadow-neu-inset">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Receitas</p>
+            <p className="text-sm text-muted-foreground mb-1 font-medium">Receitas</p>
             <p className="text-2xl font-bold text-primary">
               R$ {income.toFixed(2)}
             </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-[14px] shadow-neu bg-primary/10 flex items-center justify-center">
             <ArrowUpIcon className="w-6 h-6 text-primary" />
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-6 gradient-card shadow-card">
+      {/* Despesas */}
+      <div className="bg-card rounded-[18px] shadow-neu p-6 transition-smooth hover:shadow-neu-inset">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Despesas</p>
+            <p className="text-sm text-muted-foreground mb-1 font-medium">Despesas</p>
             <p className="text-2xl font-bold text-destructive">
               R$ {expenses.toFixed(2)}
             </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-[14px] shadow-neu bg-destructive/10 flex items-center justify-center">
             <ArrowDownIcon className="w-6 h-6 text-destructive" />
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card className="p-6 gradient-card shadow-card">
+      {/* Metas Ativas */}
+      <div className="bg-card rounded-[18px] shadow-neu p-6 transition-smooth hover:shadow-neu-inset">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">Metas Ativas</p>
-            <p className="text-2xl font-bold">{goalsCount}</p>
+            <p className="text-sm text-muted-foreground mb-1 font-medium">Metas Ativas</p>
+            <p className="text-2xl font-bold text-foreground">{goalsCount}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-[14px] shadow-neu bg-accent/20 flex items-center justify-center">
             <Target className="w-6 h-6 text-accent" />
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
