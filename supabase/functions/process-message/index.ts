@@ -50,6 +50,7 @@ serve(async (req) => {
 2. Criar metas financeiras (economizar ou investir)
 3. Fazer aportes em metas existentes
 4. Fornecer insights sobre oportunidades de economia
+5. Responder perguntas sobre impacto de compras futuras
 
 REGRAS IMPORTANTES:
 - Seja empático e não julgue o usuário
@@ -83,6 +84,17 @@ PARA ALTERAR UMA META EXISTENTE (MUDAR O VALOR-ALVO, NOME OU DATA):
   - "newTargetDate" quando for mudar a data da meta (formato AAAA-MM-DD quando possível)
   - "newName" quando for renomear a meta
 - "goalName" deve sempre indicar qual meta será alterada
+
+PARA PERGUNTAS SOBRE COMPRAS FUTURAS:
+- Se o usuário perguntar algo como "Posso comprar X de R$ Y?" ou "Posso gastar R$ X?"
+- Use "action": "future_purchase_check"
+- Em "data", inclua:
+  - "amount": valor da compra
+  - "item": nome do item (opcional)
+- Exemplo de resposta: Analisei sua projeção e vejo que se você gastar R$ X hoje, seu saldo em Y dias ficará negativo/positivo. Sugiro [alternativa prática].
+
+FORMATO DE RESPOSTA JSON (CRÍTICO):
+Responda SEMPRE APENAS com um objeto JSON puro, sem markdown.
 
 FORMATO DE RESPOSTA JSON (CRÍTICO):
 Responda SEMPRE APENAS com um objeto JSON puro, sem markdown.
@@ -518,6 +530,49 @@ Usuário: "Quero economizar 3000 reais"
         goalUpdated = true;
         parsedResponse.response = `${parsedResponse.response || "Meta atualizada com sucesso!"}${extraMessage}`;
         console.log("Goal updated successfully");
+      }
+    } else if (parsedResponse.action === "future_purchase_check" && parsedResponse.data) {
+      // Análise de impacto de compra futura
+      const { amount, item } = parsedResponse.data;
+      
+      console.log("Processing future purchase check:", { amount, item });
+      
+      // Buscar projeção do saldo
+      try {
+        const projectionResponse = await fetch(
+          `${Deno.env.get("SUPABASE_URL")}/functions/v1/calculate-projection`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: req.headers.get("authorization") || "",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        
+        if (projectionResponse.ok) {
+          const projectionData = await projectionResponse.json();
+          const futureBalance = projectionData.projection[14]?.balance || 0; // Saldo em 15 dias
+          const balanceAfterPurchase = futureBalance - Number(amount);
+          
+          const itemName = item ? ` ${item}` : "";
+          
+          if (balanceAfterPurchase < 0) {
+            parsedResponse.response = `Analisando sua projeção financeira... 📊\n\nSe você comprar${itemName} de R$ ${Number(amount).toFixed(2)} hoje, seu saldo projetado em 15 dias ficaria em R$ ${balanceAfterPurchase.toFixed(2)} (negativo).\n\n💡 Sugiro: Espere o próximo salário ou considere reduzir ${Math.round((Number(amount) / projectionData.currentBalance) * 100)}% do valor de suas metas temporariamente.`;
+          } else {
+            const safetyMargin = (balanceAfterPurchase / projectionData.currentBalance) * 100;
+            if (safetyMargin < 20) {
+              parsedResponse.response = `Analisando sua projeção financeira... 📊\n\nVocê PODE comprar${itemName} de R$ ${Number(amount).toFixed(2)}, mas seu saldo em 15 dias ficaria em R$ ${balanceAfterPurchase.toFixed(2)}. Isso representa uma margem de segurança pequena.\n\n💡 Recomendo cautela com outras despesas este mês!`;
+            } else {
+              parsedResponse.response = `Analisando sua projeção financeira... 📊\n\nBoa notícia! Você PODE comprar${itemName} de R$ ${Number(amount).toFixed(2)} sem comprometer seu saldo futuro. Seu saldo projetado em 15 dias seria R$ ${balanceAfterPurchase.toFixed(2)}. ✅`;
+            }
+          }
+        } else {
+          parsedResponse.response = "Não consegui calcular a projeção no momento. Tente novamente mais tarde.";
+        }
+      } catch (projError) {
+        console.error("Error fetching projection:", projError);
+        parsedResponse.response = "Tive um problema ao analisar sua projeção. Pode tentar novamente?";
       }
     }
 

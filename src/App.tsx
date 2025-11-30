@@ -9,6 +9,7 @@ import Onboarding from "./pages/Onboarding";
 import Goals from "./pages/Goals";
 import MonthlyReport from "./pages/MonthlyReport";
 import Transactions from "./pages/Transactions";
+import Projection from "./pages/Projection";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/goals" element={<Goals />} />
           <Route path="/report" element={<MonthlyReport />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/projection" element={<Projection />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
