@@ -1,13 +1,13 @@
 import { NavLink } from "react-router-dom";
-import { MessageSquare, Target, BarChart3, Receipt, Settings } from "lucide-react";
+import { MessageSquare, Target, BarChart3, Receipt, TrendingUp, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BottomNav = () => {
   const navItems = [
     { to: "/", icon: MessageSquare, label: "Chat" },
     { to: "/transactions", icon: Receipt, label: "Extrato" },
+    { to: "/projection", icon: TrendingUp, label: "Projeção" },
     { to: "/goals", icon: Target, label: "Metas" },
-    { to: "/report", icon: BarChart3, label: "Relatório" },
     { to: "/settings", icon: Settings, label: "Config" },
   ];
 
