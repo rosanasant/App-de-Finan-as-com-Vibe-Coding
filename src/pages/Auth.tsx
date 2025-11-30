@@ -101,97 +101,106 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 gradient-primary">
-      <Card className="w-full max-w-md p-8 shadow-card">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo com ícone neumorphic */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4">
-            <Wallet className="w-8 h-8 text-primary-foreground" />
+          <div className="w-20 h-20 rounded-[20px] bg-card shadow-neu flex items-center justify-center mb-4 transition-smooth hover:shadow-neu-inset">
+            <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center">
+              <Wallet className="w-7 h-7 text-primary-foreground" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-center">
-            {isLogin ? "Bem-vindo de volta" : "Crie sua conta"}
-          </h1>
-          <p className="text-muted-foreground text-center mt-2">
-            {isLogin
-              ? "Entre para continuar organizando suas finanças"
-              : "Comece a organizar suas finanças de forma simples"}
+          <h1 className="text-3xl font-bold text-center text-foreground">Vibe Finanças</h1>
+          <p className="text-sm text-muted-foreground text-center mt-2">
+            Seu assistente financeiro pessoal
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Nome completo</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Seu nome"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required={!isLogin}
-                disabled={loading}
-              />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-              minLength={6}
-            />
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Carregando...
-              </>
-            ) : isLogin ? (
-              "Entrar"
-            ) : (
-              "Criar conta"
+        {/* Card de login com estilo neumorphic */}
+        <div className="bg-card rounded-[20px] shadow-neu p-8 transition-smooth">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {!isLogin && (
+              <div>
+                <label htmlFor="fullName" className="text-sm font-medium text-foreground mb-2 block">
+                  Nome completo
+                </label>
+                <div className="relative">
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required={!isLogin}
+                    placeholder="Seu nome"
+                    disabled={loading}
+                    className="bg-card shadow-neu-inset border-0 rounded-[16px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary transition-smooth"
+                  />
+                </div>
+              </div>
             )}
-          </Button>
-        </form>
 
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-sm text-primary hover:underline transition-smooth"
-            disabled={loading}
-          >
-            {isLogin
-              ? "Não tem uma conta? Cadastre-se"
-              : "Já tem uma conta? Entre"}
-          </button>
+            <div>
+              <label htmlFor="email" className="text-sm font-medium text-foreground mb-2 block">
+                Email
+              </label>
+              <div className="relative">
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="seu@email.com"
+                  disabled={loading}
+                  className="bg-card shadow-neu-inset border-0 rounded-[16px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary transition-smooth"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="text-sm font-medium text-foreground mb-2 block">
+                Senha
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••"
+                  disabled={loading}
+                  className="bg-card shadow-neu-inset border-0 rounded-[16px] px-4 py-3 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary transition-smooth"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-gradient-primary rounded-[16px] shadow-neu py-3 text-primary-foreground font-semibold neu-button-hover border-0 mt-6"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                isLogin ? "Entrar" : "Cadastrar"
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              disabled={loading}
+              className="text-sm text-primary hover:text-primary/80 font-medium transition-smooth"
+            >
+              {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Entre"}
+            </button>
+          </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

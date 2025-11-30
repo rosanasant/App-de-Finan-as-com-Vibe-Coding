@@ -13,14 +13,14 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
   return (
     <div
       className={cn(
-        "flex gap-3 p-4 rounded-2xl transition-smooth animate-in fade-in slide-in-from-bottom-2",
+        "flex gap-3 p-4 rounded-[18px] transition-smooth animate-in fade-in slide-in-from-bottom-2",
         isAssistant
-          ? "bg-card shadow-soft"
-          : "bg-primary text-primary-foreground ml-8"
+          ? "glass shadow-neu mr-8"
+          : "bg-gradient-primary text-primary-foreground ml-8 shadow-neu"
       )}
     >
       {isAssistant && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <div className="flex-shrink-0 w-9 h-9 rounded-[12px] bg-gradient-primary shadow-neu flex items-center justify-center">
           <Bot className="w-5 h-5 text-primary-foreground" />
         </div>
       )}
@@ -30,7 +30,7 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
         {timestamp && (
           <span className={cn(
             "text-xs",
-            isAssistant ? "text-muted-foreground" : "text-primary-foreground/70"
+            isAssistant ? "text-muted-foreground" : "text-primary-foreground/80"
           )}>
             {timestamp.toLocaleTimeString("pt-BR", {
               hour: "2-digit",
@@ -41,8 +41,8 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
       </div>
 
       {!isAssistant && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-foreground text-primary flex items-center justify-center">
-          <User className="w-5 h-5" />
+        <div className="flex-shrink-0 w-9 h-9 rounded-[12px] bg-card shadow-neu flex items-center justify-center">
+          <User className="w-5 h-5 text-primary" />
         </div>
       )}
     </div>
