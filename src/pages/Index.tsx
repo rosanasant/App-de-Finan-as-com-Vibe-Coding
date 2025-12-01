@@ -270,15 +270,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20">
       {/* Header */}
-      <header className="border-b border-border/30 bg-card shadow-neu sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-[14px] shadow-neu bg-gradient-primary flex items-center justify-center">
-            <Wallet className="w-6 h-6 text-primary-foreground" />
+      <header className="bg-primary shadow-neu sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-[14px] shadow-neu bg-white flex items-center justify-center">
+              <Wallet className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-primary-foreground">Vibe Finanças</h1>
+              <p className="text-xs text-primary-foreground/90">Seu assistente financeiro</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold">Vibe Finanças</h1>
-            <p className="text-xs text-muted-foreground">Seu assistente financeiro</p>
-          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate("/transactions")}
+            className="bg-white text-primary hover:bg-white/90 shadow-neu"
+          >
+            <Receipt className="w-4 h-4 mr-1" />
+            EXTRATO
+          </Button>
         </div>
       </header>
 
@@ -291,16 +302,6 @@ const Index = () => {
           goalsCount={goalsCount}
         />
 
-        {/* Quick Access Button */}
-        <div className="mb-4">
-          <button
-            onClick={() => navigate("/transactions")}
-            className="w-full gap-2 bg-card shadow-neu rounded-[16px] px-4 py-3 flex items-center justify-center text-foreground font-semibold transition-smooth hover:shadow-neu-inset"
-          >
-            <Receipt className="w-5 h-5" />
-            EXTRATO
-          </button>
-        </div>
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
@@ -337,7 +338,7 @@ const Index = () => {
         {/* Input Area */}
         <div className="sticky bottom-0 bg-background pt-4 pb-2">
           <div className="flex gap-3">
-            <div className="flex-1 bg-card rounded-[16px] shadow-neu-inset">
+            <div className="flex-1 bg-white rounded-[16px] shadow-neu-inset">
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
@@ -350,7 +351,7 @@ const Index = () => {
             <button
               onClick={handleSendMessage}
               disabled={loading || !inputMessage.trim()}
-              className="w-12 h-12 rounded-[16px] bg-gradient-primary shadow-neu flex items-center justify-center text-primary-foreground disabled:opacity-50 neu-button-hover"
+              className="w-12 h-12 rounded-[16px] bg-primary hover:bg-primary/90 shadow-neu flex items-center justify-center text-primary-foreground disabled:opacity-50 neu-button-hover"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
