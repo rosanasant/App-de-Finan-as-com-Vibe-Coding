@@ -88,47 +88,53 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 210 17% 12%;
+    /* Fundo principal escuro #2D3748 */
+    --background: 217 19% 27%;
     --foreground: 210 10% 90%;
 
-    --card: 210 17% 15%;
+    /* Cards */
+    --card: 217 19% 27%;
     --card-foreground: 210 10% 90%;
 
-    --popover: 210 17% 12%;
+    --popover: 217 19% 27%;
     --popover-foreground: 210 10% 90%;
 
-    --primary: 122 39% 49%;
+    /* Verde para botões e elementos ativos #48BB78 */
+    --primary: 152 57% 51%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 20%;
+    --secondary: 215 16% 29%;
     --secondary-foreground: 210 10% 90%;
 
-    --muted: 210 15% 18%;
+    --muted: 215 16% 29%;
     --muted-foreground: 210 10% 55%;
 
-    --accent: 51 100% 50%;
+    /* Amarelo para destaques #EBB70 */
+    --accent: 43 100% 71%;
     --accent-foreground: 0 0% 20%;
 
     --destructive: 9 100% 64%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 122 39% 49%;
+    --success: 152 57% 51%;
     --success-foreground: 0 0% 100%;
     
-    --agent-bg: 210 15% 20%;
+    /* Balão do agente #4A5468 */
+    --agent-bg: 220 17% 35%;
 
-    --border: 210 15% 25%;
-    --input: 210 15% 25%;
-    --ring: 122 39% 49%;
+    --border: 215 16% 25%;
+    --input: 218 20% 20%;
+    --ring: 152 57% 51%;
 
-    --chart-1: 122 39% 49%;
-    --chart-2: 51 100% 50%;
+    --chart-1: 152 57% 51%;
+    --chart-2: 43 100% 71%;
     --chart-3: 146 50% 47%;
-    --chart-4: 210 15% 40%;
+    --chart-4: 215 16% 40%;
     --chart-5: 9 100% 64%;
     
-    --gradient-primary: linear-gradient(135deg, hsl(122, 39%, 49%), hsl(122, 39%, 39%));
-    --gradient-card: linear-gradient(145deg, hsl(210, 17%, 15%), hsl(210, 17%, 12%));
+    /* Gradiente verde para chat do usuário */
+    --gradient-primary: linear-gradient(135deg, hsl(152, 57%, 51%), hsl(152, 57%, 41%));
+    --gradient-card: linear-gradient(145deg, hsl(217, 19%, 27%), hsl(217, 19%, 24%));
     
     --shadow-neu-light: -4px -4px 8px rgba(255, 255, 255, 0.05);
     --shadow-neu-dark: 4px 4px 8px rgba(0, 0, 0, 0.4);
@@ -138,17 +144,17 @@ All colors MUST be HSL.
     --shadow-neu-inset-dark: inset 3px 3px 6px rgba(0, 0, 0, 0.3);
     --shadow-neu-inset: var(--shadow-neu-inset-light), var(--shadow-neu-inset-dark);
     
-    --glass-bg: rgba(33, 37, 41, 0.3);
+    --glass-bg: rgba(42, 50, 60, 0.3);
     --glass-border: rgba(255, 255, 255, 0.1);
 
-    --sidebar-background: 210 17% 12%;
+    --sidebar-background: 217 19% 27%;
     --sidebar-foreground: 210 10% 90%;
-    --sidebar-primary: 122 39% 49%;
+    --sidebar-primary: 152 57% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 15% 20%;
+    --sidebar-accent: 215 16% 29%;
     --sidebar-accent-foreground: 210 10% 90%;
-    --sidebar-border: 210 15% 25%;
-    --sidebar-ring: 122 39% 49%;
+    --sidebar-border: 215 16% 25%;
+    --sidebar-ring: 152 57% 51%;
   }
 }
 
