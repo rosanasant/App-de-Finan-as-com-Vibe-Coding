@@ -26,7 +26,10 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
       )}
       
       <div className="flex-1 space-y-2">
-        <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+        <p className={cn(
+          "text-sm leading-relaxed whitespace-pre-wrap",
+          isAssistant ? "text-foreground" : ""
+        )}>{content}</p>
         {timestamp && (
           <span className={cn(
             "text-xs",
