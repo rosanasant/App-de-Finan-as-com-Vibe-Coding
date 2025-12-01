@@ -15,7 +15,7 @@ export const ChatMessage = ({ role, content, timestamp }: ChatMessageProps) => {
       className={cn(
         "flex gap-3 p-4 rounded-[18px] transition-smooth animate-in fade-in slide-in-from-bottom-2",
         isAssistant
-          ? "glass shadow-neu mr-8"
+          ? "bg-agent-bg/80 backdrop-blur-sm border border-border/20 shadow-neu mr-8"
           : "bg-gradient-primary text-primary-foreground ml-8 shadow-neu"
       )}
     >
